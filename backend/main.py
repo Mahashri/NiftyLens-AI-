@@ -44,7 +44,7 @@ class Screen(BaseModel):
     query:str=Field(min_length=3,max_length=500); limit:int=Field(default=25,ge=1,le=100); sort:str|None=None; order:str=Field(default="desc",pattern="^(asc|desc)$")
 @app.post("/api/screen")
 async def screen(body:Screen):
-    if re.search(r"\\bOR\\b|[()]",body.query,re.I): raise HTTPException(400,"Anonymous screening supports AND clauses only; remove OR and parentheses.")
+    if re.search(r"\bOR\b|[()]",body.query,re.I): raise HTTPException(400,"Anonymous screening supports AND clauses only; remove OR and parentheses.")
     args={"query":body.query,"limit":body.limit,"order":body.order}
     if body.sort: args["sort"]=body.sort
     return await call("screen_stocks",args)
