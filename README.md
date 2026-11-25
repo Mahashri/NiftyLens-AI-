@@ -7,7 +7,7 @@ AI-assisted research dashboard for Indian equities (NSE/BSE), powered by the com
 ## Features
 - Screener fundamentals, typed ratios, financial statements, peer comparisons and quarterly results.
 - Anonymous market screening via the MCP `screen_stocks` tool.
-- Optional Gemini research summaries (server-side API key only).
+- Optional LangGraph + Gemini research workflow (server-side API key only).
 - Responsive browser dashboard; no local LLM required.
 
 ## Architecture
