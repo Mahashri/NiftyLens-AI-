@@ -5,7 +5,8 @@ from fastapi import FastAPI, HTTPException
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
-from backend.screener_client import ScreenerMCP\nfrom backend.agent import run_research
+from backend.screener_client import ScreenerMCP
+from backend.agent import run_research
 
 mcp = ScreenerMCP()
 @asynccontextmanager
