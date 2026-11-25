@@ -5,7 +5,7 @@ from fastapi import FastAPI, HTTPException
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
-from backend.screener_client import ScreenerMCP
+from backend.screener_client import ScreenerMCP\nfrom backend.agent import run_research
 
 mcp = ScreenerMCP()
 @asynccontextmanager
@@ -50,16 +50,12 @@ async def screen(body:Screen):
     return await call("screen_stocks",args)
 @app.post("/api/research/{ticker}")
 async def research(ticker:str):
-    key=os.getenv("GEMINI_API_KEY","").strip()
-    if not key: raise HTTPException(503,"AI summaries disabled: configure GEMINI_API_KEY on the server.")
-    data=await stock(ticker)
-    try:
-        import google.generativeai as genai
-        genai.configure(api_key=key); model=genai.GenerativeModel(os.getenv("GEMINI_MODEL","gemini-2.0-flash"))
-        prompt="Summarize strengths, risks, missing information and due-diligence questions from these company fundamentals. Educational research only; no buy/sell recommendation or price target.\n"+str(data)
-        result=await asyncio.to_thread(model.generate_content,prompt)
-        return {"symbol":data["symbol"],"summary":result.text}
-    except Exception as e: raise HTTPException(502,f"Gemini request failed: {e}") from e
+    s=symbol_ok(ticker)
+    if not os.getenv("GEMINI_API_KEY","").strip():
+        raise HTTPException(503,"AI summaries disabled: configure GEMINI_API_KEY on the server.")
+    data=await stock(s)
+    try: return {"symbol":s,"summary":await run_research(s,data)}
+    except Exception as e: raise HTTPException(502,f"LangGraph research failed: {e}") from e
 app.mount("/assets",StaticFiles(directory="frontend"),name="assets")
 @app.get("/")
 async def home(): return FileResponse("frontend/index.html")
